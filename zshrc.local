@@ -1,0 +1,113 @@
+# https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout
+#
+# .zshrc is for interactive shell configuration. You set options for the
+# interactive shell there with the setopt and unsetopt commands. You can
+# also load shell modules, set your history options, change your prompt,
+# set up zle and completion, et cetera. You also set any variables that
+# are only used in the interactive shell (e.g. $LS_COLORS).
+
+################################################
+# Setup brew
+################################################
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+################################################
+# $PATH changes
+################################################
+
+function add_to_path() {
+  if [ -d $1 ]
+  then
+    path=($1 $path)
+    export PATH
+  fi
+}
+
+add_to_path "/usr/local/opt/ruby/bin"
+add_to_path "/usr/local/sbin"
+
+# NVM
+add_to_path "$HOME/.nvm"
+
+# Mozilla build tools
+add_to_path "$HOME/.mozbuild/git-cinnabar"
+
+# Chromium build tools.
+add_to_path "$HOME/git/ext/chromium/depot_tools"
+
+# Composer
+add_to_path "$HOME/.composer/vendor/bin"
+
+# Integration tools
+add_to_path "$HOME/bin"
+
+# Persponal bin directory.
+add_to_path "$HOME/bin"
+
+################################################
+# Completion
+################################################
+if type brew &>/dev/null
+then
+  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+
+  autoload -Uz compinit
+  compinit
+fi
+
+################################################
+# History configuration
+################################################
+# Igore all duplicates.
+setopt HIST_IGNORE_ALL_DUPS
+
+# Set history size to 2000
+export HISTSIZE="2000"
+export HISTFILESIZE="2000"
+
+# Enable history search with Ctrl+R
+bindkey -v
+bindkey '^R' history-incremental-search-backward
+
+# Enable Ctrl+A, Ctrl+E, Ctrl+K
+bindkey -e
+
+# Map Ctrl+W and Escape backspace to erase word.
+bindkey '^w' backward-kill-word
+bindkey '^[[3;5~' backward-kill-word
+
+# And use the bash-style word select to break at word boundaries nicely.
+# E.g. Break on path delimiters.
+autoload -U select-word-style
+select-word-style bash
+
+# Map Ctrl+Left, Ctrl+Right
+bindkey "^[[1;5C" forward-word
+bindkey "^[[1;5D" backward-word
+
+################################################
+# NVM
+################################################
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
+################################################
+# Git Prompt
+################################################
+# Load version control information
+autoload -Uz vcs_info
+precmd() { vcs_info }
+
+# Format the vcs_info_msg_0_ variable
+zstyle ':vcs_info:git:*' formats '%b'
+zstyle ':vcs_info:git:*' formats '%F{240}(%b)%r%f'
+
+setopt PROMPT_SUBST
+[[ $cmdcount -ge 1 ]] || cmdcount=1
+preexec() { ((cmdcount++)) }
+
+# Set up the prompt (with git branch name)
+setopt PROMPT_SUBST
+PROMPT='%n in ${PWD/#$HOME/~} ${vcs_info_msg_0_} > '
+PROMPT='${cmdcount} %n@$%m:${PWD/#$HOME/~}> '
+RPROMPT='${vcs_info_msg_0_} %*'

@@ -1,0 +1,76 @@
+[user]
+  name    = Andrew Nicols
+  email = andrew@nicols.co.uk
+  signing-key = F38AE56A
+  signingkey = F38AE56A
+[color]
+  diff    = auto
+  status  = auto
+  branch  = auto
+  grep    = auto
+[alias]
+  st      = status
+  br      = branch --color
+  co      = checkout
+  cs      = !git-cs $1
+  map     = !~/git/git-map/bin/git-map
+  wdiff   = diff --color-words
+  vimdiff = !GIT_EXTERNAL_DIFF='gitvimdiff' git --no-pager diff "$@"
+  stdel   = !git st | grep delete | awk '{print $3}' | xargs git rm
+  stdelu  = !git st | grep 'deleted by us' | awk '{print $4}' | xargs git rm
+  stdelt  = !git st | grep 'deleted by them' | awk '{print $4}' | xargs git rm
+  tig     = !tig --all
+  d       = diff
+  ds      = diff --stat=500,300
+  dps     = diff --stat=500,300 -p
+  dc      = diff --cached
+  dcs     = diff --cached --stat=500,300 -p
+  l       = log
+  l1      = log -1
+  ls      = log --stat=500,300
+  ls1     = log --stat=500,300 -1
+  lps     = log --stat=500,300 -p
+  lps1    = log --stat=500,300 -p -1
+  cp      = cherry-pick
+  praise  = blame
+  squash  = rebase -i --autosquash
+  tracking = git rev-parse --abbrev-ref --symbolic-full-name @{u}
+  diff-no-yui = !git diff | filterdiff -x "*/yui/build/*":w
+
+  shifter = !bash -c 'pushd `git rev-parse --show-toplevel` && shifter --walk --recursive && popd'
+  tracking = rev-parse --abbrev-ref --symbolic-full-name @{u}
+  recess = !bash -c 'pushd `git rev-parse --show-toplevel`/theme/bootstrapbase/style > /dev/null && recess --compile --compress ../less/moodle.less > moodle.css && recess --compile --compress ../less/editor.less > editor.css && ls -l *.css && popd > /dev/null'
+  current-branch = !git branch|grep ^\\*|cut -d\\  -f2
+  other-branches = !git branch|grep -v ^\\*
+  remove-other-branches = !git branch -D `git other-branches`
+  integration-reset = !git fetch origin && mdk reset
+  integration-diff    = !git fetch origin && git show --stat=500,300 -p origin/`git current-branch`...`git current-branch`
+  integration-wdiff   = !git fetch origin && git show --color-words --stat=500,300 -p origin/`git current-branch`...`git current-branch`
+[branch]
+  autosetuprebase = never
+  autosetupmerge  = true
+[core]
+  excludesfile=/home/nicols/.gitignore
+  precomposeUnicode = true
+  abbrev = 10
+[merge]
+  tool = vimdiff
+[pack]
+  compression = 9
+  threads = 6
+[merge]
+  renamelimit = 3000
+  ff = no
+[push]
+  default = matching
+[diff]
+  renamelimit = 3000
+[cinnabar]
+  version-check = 1613893368
+  helper = /Users/nicols/.mozbuild/git-cinnabar/git-cinnabar-helper
+[http]
+  cookiefile = /Users/nicols/.gitcookies
+[init]
+  defaultBranch = main
+[pull]
+  rebase = false
